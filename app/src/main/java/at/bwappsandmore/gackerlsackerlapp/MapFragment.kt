@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.graphics.drawable.toBitmap
 import dagger.hilt.android.AndroidEntryPoint
-import org.osmdroid.api.IMapController
 import org.osmdroid.config.IConfigurationProvider
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.views.MapView
@@ -27,6 +26,9 @@ class MapFragment : Fragment() {
     @Inject
     lateinit var map: MapView
 
+    @Inject
+    lateinit var mapEventsReceiver: MapEventsReceiverImpl
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -41,18 +43,17 @@ class MapFragment : Fragment() {
             setMultiTouchControls(true)
         }
 
-        val mapController: IMapController = map.controller
+        val mapController = map.controller
         mapController.setZoom(19.5)
 
         val mGpsMyLocationProvider = GpsMyLocationProvider(activity)
         val mLocationOverlay = MyLocationNewOverlay(mGpsMyLocationProvider, map)
 
-        val icon = context?.let {
-            AppCompatResources.getDrawable(it, R.drawable.ic_baseline_pets_24)
-                ?.toBitmap()
-        }
         mLocationOverlay.apply {
-            setPersonIcon(icon)
+            setPersonIcon(context?.let {
+                AppCompatResources.getDrawable(it, R.drawable.ic_baseline_pets_24)
+                    ?.toBitmap()
+            })
             enableMyLocation()
             enableFollowLocation()
 
@@ -72,7 +73,7 @@ class MapFragment : Fragment() {
                 }
             })
         }
-        val mapEventsReceiver = MapEventsReceiverImpl()
+
         val mapEventsOverlay = MapEventsOverlay(mapEventsReceiver)
         map.overlays.add(mapEventsOverlay)
 
