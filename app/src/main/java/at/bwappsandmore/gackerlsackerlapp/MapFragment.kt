@@ -1,23 +1,30 @@
 package at.bwappsandmore.gackerlsackerlapp
 
 import android.os.Bundle
-import androidx.preference.PreferenceManager
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.graphics.drawable.toBitmap
+import dagger.hilt.android.AndroidEntryPoint
 import org.osmdroid.api.IMapController
+import org.osmdroid.config.IConfigurationProvider
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.views.MapView
-import org.osmdroid.config.Configuration
 import org.osmdroid.views.CustomZoomButtonsController
+import org.osmdroid.views.overlay.MapEventsOverlay
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class MapFragment : Fragment() {
 
+    @Inject
+    lateinit var iConfigurationProvider: IConfigurationProvider
+
+    @Inject
     lateinit var map: MapView
 
     override fun onCreateView(
@@ -25,11 +32,6 @@ class MapFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_map, container, false)
-        val ctx = activity?.applicationContext
-        Configuration.getInstance().load(ctx,
-            ctx?.let { PreferenceManager.getDefaultSharedPreferences(it) })
-        Configuration.getInstance().userAgentValue = BuildConfig.APPLICATION_ID
-
         map = view.findViewById(R.id.mapView)
 
         map.apply {
@@ -70,6 +72,9 @@ class MapFragment : Fragment() {
                 }
             })
         }
+        val mapEventsReceiver = MapEventsReceiverImpl()
+        val mapEventsOverlay = MapEventsOverlay(mapEventsReceiver)
+        map.overlays.add(mapEventsOverlay)
 
         return view
     }

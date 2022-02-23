@@ -2,6 +2,7 @@ plugins {
     id 'com.android.application'
     id 'kotlin-android'
     id 'kotlin-kapt'
+    id 'dagger.hilt.android.plugin'
 }
 
 android {
@@ -55,9 +56,15 @@ dependencies {
     // Jetpack Compose Integration
     implementation "androidx.navigation:navigation-compose:2.5.0-alpha02"
 
-    //Open Street Maps
+    //Open Street Map
     implementation "org.osmdroid:osmdroid-android:$osm_version"
+    // Open Street Map BonusPack
+    implementation 'com.github.MKergall:osmbonuspack:6.7.0'
 
     // Preference Manager Android 10 Support Library
     implementation 'androidx.preference:preference-ktx:1.2.0'
+
+    // Hilt Dependency Injection
+    implementation "com.google.dagger:hilt-android:2.38.1"
+    kapt "com.google.dagger:hilt-compiler:2.38.1"
 }
